@@ -482,3 +482,10 @@ try {
 ```
 
 > Key idea: Always handle exceptions correctly, clean up resources, and never use them for controlling normal flow.
+
+---
+
+## 🎓 Certificate
+
+<img width="1600" height="1190" alt="UC-5851ca79-8b80-497b-9f75-3b8d44a27e9b" src="https://github.com/user-attachments/assets/c2f204bb-f5e1-45ee-8f49-fa8ed5285931" />
+
