@@ -294,3 +294,130 @@ if (conn.getState() != ConnectionState.Closed) {
 
 > Key idea: Validate inputs, fail fast, throw specific exceptions, and avoid exceptions for regular control flow to maintain performance and readability.
 
+## Part 4: Java Exceptions – When to Throw and Catch
+
+### What Does an Exception Mean?
+
+* In Java, when an error occurs within a method, the method **creates an exception object** and throws it to the runtime system.
+* Two main categories:
+
+  1. **Checked exceptions** – must be declared or handled (`IOException`, `SQLException`).
+  2. **Unchecked exceptions** – runtime exceptions that don’t require explicit handling (`NullPointerException`, `ArithmeticException`).
+* `java.lang.Exception` is the base class for all exceptions; `java.lang.RuntimeException` is the base for unchecked exceptions.
+
+### When to Throw Exceptions (Fail Fast Principle)
+
+1. **Fail Fast**
+
+```java
+static void findWinner(int[] winners) {
+    if (winners == null) {
+        throw new IllegalArgumentException("Parameter 'winners' cannot be null");
+    }
+    otherMethodThatUsesTheArray(winners);
+}
+```
+
+* Validate inputs early, save resources, and simplify debugging.
+
+2. **Check Object Status**
+
+```java
+void writeLog(File logFile) {
+    if (!logFile.canWrite()) {
+        throw new IllegalStateException("Log file cannot be written to (read-only)");
+    }
+    // Else write data to the log
+}
+```
+
+* Always check object state before operations to prevent invalid results or failures.
+
+3. **Throw Specific Exceptions Only**
+
+```java
+static int getValueFromArray(int[] array, int index) {
+    try {
+        return array[index];
+    } catch (ArrayIndexOutOfBoundsException ex) {
+        throw ex; // Use framework default if sufficient
+    }
+}
+```
+
+* Avoid throwing generic exceptions or unnecessary wrapping.
+
+4. **Don’t Return Error Codes**
+
+* Throw exceptions instead of returning error codes. Safer because calling code cannot forget to check.
+
+5. **Exceptions Are Expensive**
+
+```java
+if (conn.getState() != ConnectionState.Closed) {
+    conn.close();
+}
+```
+
+* Avoid using exceptions for normal control flow; only for exceptional situations.
+
+6. **When to Catch Exceptions**
+
+* Catch exceptions **only when you can handle them meaningfully**.
+* Always catch **specific exceptions before generic ones**.
+
+```java
+try {
+    File file = new File(filePath);
+    Scanner sc = new Scanner(file);
+} catch (FileNotFoundException e) {
+    System.out.println("File not found, please enter another path.");
+    promptUserForAnotherFilePath();
+}
+```
+
+7. **Partial Handling and Re-throw**
+
+```java
+try {
+    File file = new File(filePath);
+    Scanner sc = new Scanner(file);
+} catch (FileNotFoundException e) {
+    logger.log(Level.SEVERE, "File not found", e);
+    throw e;
+}
+```
+
+* Log and clean up if needed, but re-throw if you cannot fully handle the exception.
+
+8. **Rollback / Cleanup**
+
+```java
+try {
+    account.deposit(amount);
+    dbConnection.save();
+} catch (Exception e) {
+    dbConnection.rollback();
+    throw e;
+} finally {
+    closeResources();
+}
+```
+
+* Clean up side effects or rollback to maintain consistent state.
+
+9. **Swallow Exceptions at Highest Layer**
+
+```java
+try {
+    mediator.send(new UpdatePostCommand(viewModel));
+    return view(viewModel);
+} catch (Exception e) {
+    logger.log(Level.SEVERE, "Error updating post", e);
+    return view(viewModel);
+}
+```
+
+* Only swallow exceptions at the topmost layer (UI or API). Lower layers should re-throw.
+
+
