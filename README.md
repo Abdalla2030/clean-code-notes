@@ -1,190 +1,382 @@
 # Clean Code Notes
 
-This repository is a summary of the Udemy course: [Clean Code in Arabic](https://www.udemy.com/course/clean-code-part-1-c-in-arabic/).
-It covers the main rules and examples from the course in **three parts**: Naming Convention, Functions, and Comments. All examples are translated into Java for practice.
+This repository contains the notes I collected while studying the Udemy course.
+
+The notes summarize the main rules and examples from the course. The examples are written in Java for practice.
+
+## 📚 Course Reference
+
+**Course:** [Clean Code in Arabic - Udemy](https://www.udemy.com/course/clean-code-part-1-c-in-arabic/)
+
+**Instructor:** [Mohamed Hassan](https://www.linkedin.com/in/mohamed-hassan-amer?originalSubdomain=ae)
+
+**Language:** Arabic
+
+**Duration:** 1 hour, 19 lectures
+
+---
+
+## File Structure Overview
+
+The file is organized to reflect the course structure with full content in each part:
+
+### Part 1: Naming Convention
+
+All rules with bad vs good examples.
+
+### Part 2: Functions
+
+Includes large multi-line bad examples, corrected code, DRY, dependency magnets, and exception usage.
+
+### Part 3: Comments
+
+All content preserved including journal logs, commented-out code, and best practices.
+
+### Part 4: Java Exceptions Summary
+
+Full details on exceptions, including checked vs unchecked, fail fast, rollback, cleanup, re-throw, and what to avoid.
+
+### Part 5: Certificate
+
+Full certificate visual included.
+
+Each section contains the full theory, all bad vs good examples, and practical key takeaways.
 
 ---
 
 ## Part 1: Naming Convention
 
-1. **Use relevant names**
+### 1. Use Relevant Names
 
-   * ❌ `int d;` → unclear
-   * ✅ `int elapsedTimeInDays;` → clear
+Bad:
 
-2. **Use pronounceable names**
+```java
+int d;
+```
 
-   * ❌ `private DateTime modymdhms;` → hard to read
-   * ✅ `private DateTime modificationFullDate;` → easy to read
+Good:
 
-3. **Avoid encodings and prefixes**
+```java
+int elapsedTimeInDays;
+```
 
-   * ❌ `PhoneNumber phoneString;` → name tied to type
-   * ✅ `PhoneNumber phone;` → clear
-   * ❌ `private string m_dsc;` → unclear
-   * ✅ `private string description;` → clear
+The good name explains exactly what the value represents.
 
-4. **Classes and objects should be nouns**
+---
 
-   * ✅ `Customer, Account, User`
-   * ❌ `Manage, Calculating, Draw`
+### 2. Use Pronounceable Names
 
-5. **Methods should be verbs**
+Bad:
 
-   * ✅ `DeletePage, GetName, Save`
-   * ❌ `Customer, Account, User`
+```java
+private Date modymdhms;
+```
 
-> Key idea: Names should be descriptive, readable, and follow Java conventions. Classes represent things → nouns; methods represent actions → verbs.
+Good:
+
+```java
+private Date modificationFullDate;
+```
+
+A pronounceable name is easier to read, discuss, and remember.
+
+---
+
+### 3. Avoid Encodings and Prefixes
+
+Bad:
+
+```java
+PhoneNumber phoneString;
+```
+
+Good:
+
+```java
+PhoneNumber phone;
+```
+
+Bad:
+
+```java
+private String m_dsc;
+```
+
+Good:
+
+```java
+private String description;
+```
+
+Avoid adding unnecessary prefixes, type hints, or unclear abbreviations to names.
+
+---
+
+### 4. Classes and Objects Should Be Nouns
+
+Good examples:
+
+```java
+Customer
+Account
+User
+```
+
+Bad examples:
+
+```java
+Manage
+Calculating
+Draw
+```
+
+Classes represent things, so their names should usually be nouns.
+
+---
+
+### 5. Methods Should Be Verbs
+
+Good examples:
+
+```java
+deletePage()
+getName()
+save()
+```
+
+Bad examples:
+
+```java
+Customer
+Account
+User
+```
+
+Methods represent actions, so their names should usually be verbs.
+
+---
+
+### Key Takeaway
+
+Names should be descriptive, readable, and follow Java conventions. Classes represent things, while methods represent actions.
 
 ---
 
 ## Part 2: Functions
 
-1. **Function implementation should be as small as possible**
-   Keep line count and parameters low for readability.
+### 1. Function Implementation Should Be as Small as Possible
 
-**Bad Example:**
+Keep the number of lines and parameters low to improve readability.
+
+Bad example:
 
 ```java
-public string RenderPageWithSetupsAndTeardowns(PageData pageData, bool isSuite) {
-    bool isTestPage = pageData.HasAttribute("Test");
+public String renderPageWithSetupsAndTeardowns(PageData pageData, boolean isSuite) {
+    boolean isTestPage = pageData.hasAttribute("Test");
     if (isTestPage) {
-        WikiPage testPage = pageData.GetWikiPage();
-        StringBuffer newPageContent = new StringBuffer();
-        IncludeSetupPages(testPage, newPageContent, isSuite);
-        newPageContent.append(pageData.GetContent());
-        IncludeTeardownPages(testPage, newPageContent, isSuite);
-        pageData.setContent(newPageContent.ToString());
+        WikiPage testPage = pageData.getWikiPage();
+        StringBuilder newPageContent = new StringBuilder();
+        includeSetupPages(testPage, newPageContent, isSuite);
+        newPageContent.append(pageData.getContent());
+        includeTeardownPages(testPage, newPageContent, isSuite);
+        pageData.setContent(newPageContent.toString());
     }
-    return pageData.GetHtml();
+    return pageData.getHtml();
 }
 ```
 
-**Good Example:**
+Good example:
 
 ```java
-public string RenderPageWithSetupsAndTeardowns(PageData pageData, bool isSuite) {
-    if (IsTestPage(pageData))
-        IncludeSetupAndTeardownPages(pageData, isSuite);
-    return pageData.GetHtml();
+public String renderPageWithSetupsAndTeardowns(PageData pageData, boolean isSuite) {
+    if (isTestPage(pageData)) {
+        includeSetupAndTeardownPages(pageData, isSuite);
+    }
+    return pageData.getHtml();
 }
 ```
 
-2. **Blocks within `if`, `else`, `while` should be one line long**
+The good version hides the details behind meaningful helper methods.
 
-**Bad Example:**
+---
+
+### 2. Blocks Within `if`, `else`, and `while` Should Be Small
+
+Bad example:
 
 ```java
 if (id != null) {
-    PrintStudent();
+    printStudent();
+    logStudentAccess();
+    updateLastSeenDate();
 } else {
-    PrintError();
+    printError();
+    logError();
 }
 ```
 
-**Good Example:**
+Good example:
 
 ```java
-if (id != null)
-    PrintStudent();
-else
-    PrintError();
-```
-
-3. **Functions should do one thing, do it well, and do it only**
-
-**Bad Example:**
-
-```java
-public void AddEmployee() {
-    var employee = new Employee() { FirstName="Mohamed", LastName="Hassan" };
-    SaveUserToDatabase(employee);
-    PrintSuccessMessage();
+if (id != null) {
+    handleExistingStudent();
+} else {
+    handleMissingStudent();
 }
 ```
 
-**Good Example:**
+The main point is that each block should stay short and easy to understand.
+
+---
+
+### 3. Functions Should Do One Thing, Do It Well, and Do It Only
+
+Bad example:
 
 ```java
-public bool AddEmployee() {
-    var employee = new Employee() { FirstName="Mohamed", LastName="Hassan" };
-    return SaveUserToDatabase(employee);
+public void addEmployee() {
+    Employee employee = new Employee("Mohamed", "Hassan");
+    saveUserToDatabase(employee);
+    printSuccessMessage();
 }
 ```
 
-4. **Prefer exceptions over returning error codes**
-
-**Bad Example:**
+Good example:
 
 ```java
-if (DeletePage(page) == ErrorCode.Error) { ... }
+public boolean addEmployee() {
+    Employee employee = new Employee("Mohamed", "Hassan");
+    return saveUserToDatabase(employee);
+}
 ```
 
-**Good Example:**
+The good version focuses on one clear responsibility.
+
+---
+
+### 4. Prefer Exceptions Over Returning Error Codes
+
+Bad example:
+
+```java
+if (deletePage(page) == ErrorCode.ERROR) {
+    // handle error
+}
+```
+
+Good example:
 
 ```java
 try {
-    DeletePage(page);
-    registry.DeleteReference(page.name);
-    configKeys.DeleteKey(page.name.makeKey());
+    deletePage(page);
+    registry.deleteReference(page.getName());
+    configKeys.deleteKey(page.getName().makeKey());
 } catch (Exception e) {
-    logger.log(e.GetMessage());
+    logger.log(e.getMessage());
 }
 ```
 
-5. **Don’t Repeat Yourself (DRY)**
+Exceptions make the main flow cleaner and prevent callers from forgetting to check error codes.
 
-**Bad Example:**
+---
 
-```java
-private static void DoSomething() { ... }
-private static void DoSomethingAgain() { ... }
-```
+### 5. Don’t Repeat Yourself (DRY)
 
-**Good Example:**
+Bad example:
 
 ```java
-private static void PrintEmployee(Employee employee) {
-    string format = "{0} is {1}, lives in {2}, age {3}";
-    Console.WriteLine(format, employee.FirstName, employee.Relation, employee.Address, employee.Age);
+private static void doSomething() {
+    // repeated logic
+}
+
+private static void doSomethingAgain() {
+    // same repeated logic
 }
 ```
 
-6. **Avoid dependency magnets**
+Good example:
 
-* Bad: returning error codes (e.g., `enum ErrorCode { Ok, Invalid, Locked, Waiting }`)
+```java
+private static void printEmployee(Employee employee) {
+    String format = "%s is %s, lives in %s, age %d";
+    System.out.println(String.format(
+        format,
+        employee.getFirstName(),
+        employee.getRelation(),
+        employee.getAddress(),
+        employee.getAge()
+    ));
+}
+```
 
-  * Any function using this enum becomes tightly coupled. Adding new codes requires recompiling dependent code.
-* Good: use exceptions instead
+Repeated logic should be centralized in one place.
 
-  * New exception types inherit from a base exception class.
-  * Can be added without forcing recompilation or redeployment.
+---
 
-> Key idea: Functions should be small, focused, readable, and do only one thing. Keep blocks short, use exceptions for errors, and centralize repeated logic to follow DRY.
+### 6. Avoid Dependency Magnets
+
+Bad idea: returning error codes.
+
+```java
+enum ErrorCode {
+    OK,
+    INVALID,
+    LOCKED,
+    WAITING
+}
+```
+
+Problems:
+
+- Any function using this enum becomes tightly coupled to it.
+- Adding new codes may require recompiling dependent code.
+
+Better idea: use exceptions instead.
+
+Benefits:
+
+- New exception types can inherit from a base exception class.
+- New exceptions can be added without forcing all dependent code to change.
+
+---
+
+### Key Takeaway
+
+Functions should be small, focused, readable, and do only one thing. Keep blocks short, use exceptions for errors, and centralize repeated logic to follow DRY.
 
 ---
 
 ## Part 3: Comments
 
-1. **Comments don’t make up for bad code**
+### 1. Comments Don’t Make Up for Bad Code
 
-   * Focus on writing clear, self-explanatory code instead of relying on comments.
+Comments should not be used to explain unclear code that could be improved by better naming, smaller functions, or clearer structure.
 
-2. **Explain yourself in code**
+---
 
-   * Use meaningful names, small functions, and clear logic.
+### 2. Explain Yourself in Code
 
-3. **Good comments can be:**
+Use meaningful names, small functions, and clear logic so the code explains itself as much as possible.
 
-   * **Legal** → copyright, license notices
-   * **Clarification** → explain tricky logic
-   * **Documentation** → public API descriptions, `<summary>` tags
-   * **Informative** → extra context about usage
-   * **TODO** → temporary notes, to be removed after review
+---
 
-4. **Bad comments examples**
+### 3. Good Comments Can Be Useful
 
-   * **Journal comments** – long historical logs inside the code
+Good comments include:
+
+- **Legal comments**: copyright or license notices.
+- **Clarification comments**: explain tricky logic.
+- **Documentation comments**: public API descriptions or JavaDoc.
+- **Informative comments**: extra context about usage.
+- **TODO comments**: temporary notes that should be reviewed later.
+
+---
+
+### 4. Bad Comments Examples
+
+#### Journal Comments
+
+Avoid keeping long historical logs inside the code.
 
 ```java
 /* Changes (from 11-Oct-2001)
@@ -198,116 +390,76 @@ private static void PrintEmployee(Employee employee) {
  */
 ```
 
-* **Commented-out code** – old code left in the file
+#### Commented-Out Code
+
+Avoid leaving old commented-out code in the file.
 
 ```java
-//private static void PrintEmployee(Employee employee)
+//private static void printEmployee(Employee employee)
 //{
-//    string format = "{0} is {1}, lives in {2}, age {3}";
-//    Console.WriteLine(format,
-//        employee.FirstName,
-//        employee.Relation,
-//        employee.Address,
-//        employee.Age);
+//    String format = "%s is %s, lives in %s, age %d";
+//    System.out.println(String.format(
+//        format,
+//        employee.getFirstName(),
+//        employee.getRelation(),
+//        employee.getAddress(),
+//        employee.getAge()
+//    ));
 //}
 ```
 
-> **Key idea:** Avoid cluttering your code with historical logs or commented-out code. Comments should clarify, not replace refactoring or meaningful code.
+---
+
+### Key Takeaway
+
+Avoid cluttering your code with historical logs or commented-out code. Comments should clarify, not replace refactoring or meaningful code.
 
 ---
 
-# Java Exceptions Summary
+## Part 4: Java Exceptions Summary
 
-This section summarizes Java exceptions and when to throw them. It builds upon the Clean Code principles we have been adding to the README.
+This section summarizes Java exceptions, when to throw them, when to catch them, and what to avoid while handling them.
 
-## What Does an Exception Mean?
-
-* In Java, when an error occurs within a method, the method **creates an exception object** and throws it to the runtime system.
-* There are **two main categories**:
-
-  1. **Checked exceptions** – must be declared or handled (e.g., `IOException`, `SQLException`).
-  2. **Unchecked exceptions** – runtime exceptions that don’t require explicit handling (e.g., `NullPointerException`, `ArithmeticException`).
-* `java.lang.Exception` is the **base class** for all exceptions.
-* `java.lang.RuntimeException` is the base for unchecked exceptions.
-
-## When to Throw Exceptions (Fail Fast Principle)
-
-### 1. Fail Fast
-
-```java
-static void findWinner(int[] winners) {
-    if (winners == null) {
-        throw new IllegalArgumentException("Parameter 'winners' cannot be null");
-    }
-    otherMethodThatUsesTheArray(winners);
-}
-```
-
-* Prevent continuing execution with invalid inputs.
-* Failing early saves resources and simplifies debugging.
-
-### 2. Check Object Status
-
-```java
-void writeLog(File logFile) {
-    if (!logFile.canWrite()) {
-        throw new IllegalStateException("Log file cannot be written to (read-only)");
-    }
-    // Else write data to the log
-}
-```
-
-* Always validate object state before operations to prevent invalid results or failures.
-* Saves resources and debugging time.
-
-### 3. Throw Specific Exceptions Only
-
-```java
-static int getValueFromArray(int[] array, int index) {
-    try {
-        return array[index];
-    } catch (ArrayIndexOutOfBoundsException ex) {
-        throw ex; // Use default exception in framework if sufficient
-    }
-}
-```
-
-* Avoid throwing generic exceptions or creating new ones when the framework provides a suitable exception.
-* Improves readability and reduces unnecessary wrapping.
-
-### 4. Don’t Return Error Codes
-
-* Always throw exceptions instead of returning error codes.
-* Safer because the calling code cannot forget to check the error.
-
-### 5. Exceptions Are Expensive
-
-```java
-if (conn.getState() != ConnectionState.Closed) {
-    conn.close();
-}
-```
-
-* Avoid using exceptions for normal control flow.
-* Exception creation and stack trace collection (`fillInStackTrace`) is expensive.
-* Use exception only for truly exceptional situations.
-
-> Key idea: Validate inputs, fail fast, throw specific exceptions, and avoid exceptions for regular control flow to maintain performance and readability.
-
-## Part 4: Java Exceptions – When to Throw and Catch
+---
 
 ### What Does an Exception Mean?
 
-* In Java, when an error occurs within a method, the method **creates an exception object** and throws it to the runtime system.
-* Two main categories:
+In Java, when an error occurs inside a method, the method creates an exception object and throws it to the runtime system.
 
-  1. **Checked exceptions** – must be declared or handled (`IOException`, `SQLException`).
-  2. **Unchecked exceptions** – runtime exceptions that don’t require explicit handling (`NullPointerException`, `ArithmeticException`).
-* `java.lang.Exception` is the base class for all exceptions; `java.lang.RuntimeException` is the base for unchecked exceptions.
+There are two main categories:
 
-### When to Throw Exceptions (Fail Fast Principle)
+1. **Checked exceptions**: must be declared or handled.
 
-1. **Fail Fast**
+Examples:
+
+```java
+IOException
+SQLException
+```
+
+2. **Unchecked exceptions**: runtime exceptions that do not require explicit handling.
+
+Examples:
+
+```java
+NullPointerException
+ArithmeticException
+```
+
+Important base classes:
+
+```java
+java.lang.Exception
+java.lang.RuntimeException
+```
+
+`java.lang.Exception` is the base class for exceptions, and `java.lang.RuntimeException` is the base class for unchecked exceptions.
+
+---
+
+### When to Throw Exceptions
+
+#### 1. Fail Fast
 
 ```java
 static void findWinner(int[] winners) {
@@ -318,79 +470,142 @@ static void findWinner(int[] winners) {
 }
 ```
 
-* Validate inputs early, save resources, and simplify debugging.
+Benefits:
 
-2. **Check Object Status**
+- Prevent continuing execution with invalid inputs.
+- Save resources.
+- Make debugging easier.
+
+---
+
+#### 2. Check Object Status
 
 ```java
 void writeLog(File logFile) {
     if (!logFile.canWrite()) {
-        throw new IllegalStateException("Log file cannot be written to (read-only)");
+        throw new IllegalStateException("Log file cannot be written to because it is read-only");
     }
-    // Else write data to the log
+
+    // Write data to the log file
 }
 ```
 
-* Always check object state before operations to prevent invalid results or failures.
+Always validate object state before operations to prevent invalid results or failures.
 
-3. **Throw Specific Exceptions Only**
+---
+
+#### 3. Throw Specific Exceptions Only
 
 ```java
 static int getValueFromArray(int[] array, int index) {
     try {
         return array[index];
     } catch (ArrayIndexOutOfBoundsException ex) {
-        throw ex; // Use framework default if sufficient
+        throw ex;
     }
 }
 ```
 
-* Avoid throwing generic exceptions or unnecessary wrapping.
+Avoid throwing generic exceptions or creating new ones when the framework already provides a suitable exception.
 
-4. **Don’t Return Error Codes**
+---
 
-* Throw exceptions instead of returning error codes. Safer because calling code cannot forget to check.
+#### 4. Don’t Return Error Codes
 
-5. **Exceptions Are Expensive**
+Throw exceptions instead of returning error codes.
+
+Reason:
+
+- Calling code may forget to check the returned error code.
+- Exceptions make failure clearer and harder to ignore.
+
+---
+
+#### 5. Exceptions Are Expensive
 
 ```java
-if (conn.getState() != ConnectionState.Closed) {
+if (conn.getState() != ConnectionState.CLOSED) {
     conn.close();
 }
 ```
 
-* Avoid using exceptions for normal control flow; only for exceptional situations.
+Avoid using exceptions for normal control flow.
 
-6. **When to Catch Exceptions**
+Reason:
 
-* Catch exceptions **only when you can handle them meaningfully**.
-* Always catch **specific exceptions before generic ones**.
+- Exception creation is expensive.
+- Stack trace collection using `fillInStackTrace` is expensive.
+- Exceptions should be used only for exceptional situations.
+
+---
+
+### When to Catch Exceptions
+
+#### 1. Catch Exceptions Only When You Can Handle Them Meaningfully
 
 ```java
 try {
     File file = new File(filePath);
-    Scanner sc = new Scanner(file);
+    Scanner scanner = new Scanner(file);
 } catch (FileNotFoundException e) {
     System.out.println("File not found, please enter another path.");
     promptUserForAnotherFilePath();
 }
 ```
 
-7. **Partial Handling and Re-throw**
+Catch the exception only if you can do something useful with it.
+
+---
+
+#### 2. Catch Specific Exceptions Before Generic Ones
+
+Specific exceptions should come before general exceptions.
+
+Bad example:
+
+```java
+try {
+    int value = numbers[index];
+} catch (Exception e) {
+    System.out.println("General error");
+} catch (ArrayIndexOutOfBoundsException e) {
+    System.out.println("Invalid index");
+}
+```
+
+Good example:
+
+```java
+try {
+    int value = numbers[index];
+} catch (ArrayIndexOutOfBoundsException e) {
+    System.out.println("Invalid index");
+} catch (Exception e) {
+    System.out.println("General error");
+}
+```
+
+The generic exception should not be placed before the specific exception.
+
+---
+
+#### 3. Partial Handling and Re-throw
 
 ```java
 try {
     File file = new File(filePath);
-    Scanner sc = new Scanner(file);
+    Scanner scanner = new Scanner(file);
 } catch (FileNotFoundException e) {
     logger.log(Level.SEVERE, "File not found", e);
     throw e;
 }
 ```
 
-* Log and clean up if needed, but re-throw if you cannot fully handle the exception.
+Log and clean up if needed, but re-throw if you cannot fully handle the exception.
 
-8. **Rollback / Cleanup**
+---
+
+#### 4. Rollback and Cleanup
 
 ```java
 try {
@@ -404,9 +619,11 @@ try {
 }
 ```
 
-* Clean up side effects or rollback to maintain consistent state.
+Use rollback and cleanup to keep the system in a consistent state.
 
-9. **Swallow Exceptions at Highest Layer**
+---
+
+#### 5. Swallow Exceptions Only at the Highest Layer
 
 ```java
 try {
@@ -418,56 +635,80 @@ try {
 }
 ```
 
-* Only swallow exceptions at the topmost layer (UI or API). Lower layers should re-throw.
+Only swallow exceptions at the topmost layer, such as UI or API layer. Lower layers should usually re-throw.
 
-## Part 5: Avoid in Handling Exceptions
+---
 
-### 1. Do Not Change Program Flow Using Exceptions
+### Avoid in Handling Exceptions
 
-* Do not use exceptions to control normal program logic.
-* Exceptions should signal truly unexpected errors.
+#### 1. Do Not Change Program Flow Using Exceptions
+
+Do not use exceptions to control normal program logic.
+
+Good example:
 
 ```java
 boolean isValid = validateProduct(product);
-if (!isValid) return view(product);
+if (!isValid) {
+    return view(product);
+}
 
 createProduct(product);
 return view(product);
 ```
 
-### 2. Don’t Use Exceptions in Prototypes
+Exceptions should signal truly unexpected errors.
 
-* Avoid passing or returning exceptions as parameters or return values.
-* Only use exceptions in specialized patterns like an exception factory.
+---
+
+#### 2. Don’t Use Exceptions in Prototypes
+
+Avoid passing or returning exceptions as normal parameters or return values.
+
+Use this only in specialized patterns, such as an exception factory.
 
 ```java
 Exception analyzeHttpError(int errorCode) {
-    if (errorCode < 400) throw new NotAnErrorException();
-    switch(errorCode) {
-        case 403: return new ForbiddenException();
-        case 404: return new NotFoundException();
-        case 500: return new InternalServerErrorException();
-        default: return new UnknownHttpErrorCodeException(errorCode);
+    if (errorCode < 400) {
+        throw new NotAnErrorException();
+    }
+
+    switch (errorCode) {
+        case 403:
+            return new ForbiddenException();
+        case 404:
+            return new NotFoundException();
+        case 500:
+            return new InternalServerErrorException();
+        default:
+            return new UnknownHttpErrorCodeException(errorCode);
     }
 }
 ```
 
-### 3. Do Nothing (Pokémon Exception Handling)
+---
 
-* Never leave empty catch blocks.
-* Empty catch blocks hide bugs and make debugging harder.
+#### 3. Do Nothing: Pokémon Exception Handling
+
+Never leave empty catch blocks.
+
+Bad example:
 
 ```java
 try {
     processData();
 } catch (Exception e) {
-    // Do nothing – avoid!
+    // Do nothing - avoid this
 }
 ```
 
-### 4. Don’t Miss Finally for Cleanup
+Empty catch blocks hide bugs and make debugging harder.
 
-* `finally` blocks are used to **always clean up resources**, regardless of exceptions.
+---
+
+#### 4. Don’t Miss `finally` for Cleanup
+
+`finally` blocks are used to always clean up resources, regardless of exceptions.
 
 ```java
 FileOutputStream file = null;
@@ -481,11 +722,14 @@ try {
 }
 ```
 
-> Key idea: Always handle exceptions correctly, clean up resources, and never use them for controlling normal flow.
+---
+
+### Key Takeaway
+
+Validate inputs, fail fast, throw specific exceptions, catch only when you can handle the error meaningfully, clean up resources, and never use exceptions for normal control flow.
 
 ---
 
-## 🎓 Certificate
+## Part 5: Certificate
 
 <img width="1600" height="1190" alt="UC-5851ca79-8b80-497b-9f75-3b8d44a27e9b" src="https://github.com/user-attachments/assets/c2f204bb-f5e1-45ee-8f49-fa8ed5285931" />
-
