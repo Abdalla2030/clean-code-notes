@@ -215,3 +215,82 @@ private static void PrintEmployee(Employee employee) {
 > **Key idea:** Avoid cluttering your code with historical logs or commented-out code. Comments should clarify, not replace refactoring or meaningful code.
 
 ---
+
+# Java Exceptions Summary
+
+This section summarizes Java exceptions and when to throw them. It builds upon the Clean Code principles we have been adding to the README.
+
+## What Does an Exception Mean?
+
+* In Java, when an error occurs within a method, the method **creates an exception object** and throws it to the runtime system.
+* There are **two main categories**:
+
+  1. **Checked exceptions** – must be declared or handled (e.g., `IOException`, `SQLException`).
+  2. **Unchecked exceptions** – runtime exceptions that don’t require explicit handling (e.g., `NullPointerException`, `ArithmeticException`).
+* `java.lang.Exception` is the **base class** for all exceptions.
+* `java.lang.RuntimeException` is the base for unchecked exceptions.
+
+## When to Throw Exceptions (Fail Fast Principle)
+
+### 1. Fail Fast
+
+```java
+static void findWinner(int[] winners) {
+    if (winners == null) {
+        throw new IllegalArgumentException("Parameter 'winners' cannot be null");
+    }
+    otherMethodThatUsesTheArray(winners);
+}
+```
+
+* Prevent continuing execution with invalid inputs.
+* Failing early saves resources and simplifies debugging.
+
+### 2. Check Object Status
+
+```java
+void writeLog(File logFile) {
+    if (!logFile.canWrite()) {
+        throw new IllegalStateException("Log file cannot be written to (read-only)");
+    }
+    // Else write data to the log
+}
+```
+
+* Always validate object state before operations to prevent invalid results or failures.
+* Saves resources and debugging time.
+
+### 3. Throw Specific Exceptions Only
+
+```java
+static int getValueFromArray(int[] array, int index) {
+    try {
+        return array[index];
+    } catch (ArrayIndexOutOfBoundsException ex) {
+        throw ex; // Use default exception in framework if sufficient
+    }
+}
+```
+
+* Avoid throwing generic exceptions or creating new ones when the framework provides a suitable exception.
+* Improves readability and reduces unnecessary wrapping.
+
+### 4. Don’t Return Error Codes
+
+* Always throw exceptions instead of returning error codes.
+* Safer because the calling code cannot forget to check the error.
+
+### 5. Exceptions Are Expensive
+
+```java
+if (conn.getState() != ConnectionState.Closed) {
+    conn.close();
+}
+```
+
+* Avoid using exceptions for normal control flow.
+* Exception creation and stack trace collection (`fillInStackTrace`) is expensive.
+* Use exception only for truly exceptional situations.
+
+> Key idea: Validate inputs, fail fast, throw specific exceptions, and avoid exceptions for regular control flow to maintain performance and readability.
+
