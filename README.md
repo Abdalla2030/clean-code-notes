@@ -420,4 +420,65 @@ try {
 
 * Only swallow exceptions at the topmost layer (UI or API). Lower layers should re-throw.
 
+## Part 5: Avoid in Handling Exceptions
 
+### 1. Do Not Change Program Flow Using Exceptions
+
+* Do not use exceptions to control normal program logic.
+* Exceptions should signal truly unexpected errors.
+
+```java
+boolean isValid = validateProduct(product);
+if (!isValid) return view(product);
+
+createProduct(product);
+return view(product);
+```
+
+### 2. Don’t Use Exceptions in Prototypes
+
+* Avoid passing or returning exceptions as parameters or return values.
+* Only use exceptions in specialized patterns like an exception factory.
+
+```java
+Exception analyzeHttpError(int errorCode) {
+    if (errorCode < 400) throw new NotAnErrorException();
+    switch(errorCode) {
+        case 403: return new ForbiddenException();
+        case 404: return new NotFoundException();
+        case 500: return new InternalServerErrorException();
+        default: return new UnknownHttpErrorCodeException(errorCode);
+    }
+}
+```
+
+### 3. Do Nothing (Pokémon Exception Handling)
+
+* Never leave empty catch blocks.
+* Empty catch blocks hide bugs and make debugging harder.
+
+```java
+try {
+    processData();
+} catch (Exception e) {
+    // Do nothing – avoid!
+}
+```
+
+### 4. Don’t Miss Finally for Cleanup
+
+* `finally` blocks are used to **always clean up resources**, regardless of exceptions.
+
+```java
+FileOutputStream file = null;
+try {
+    file = new FileOutputStream("file.txt");
+    file.write(0xFF);
+} finally {
+    if (file != null) {
+        file.close();
+    }
+}
+```
+
+> Key idea: Always handle exceptions correctly, clean up resources, and never use them for controlling normal flow.
